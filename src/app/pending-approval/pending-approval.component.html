@@ -1,0 +1,20 @@
+<app-navigation></app-navigation>
+<br/>
+<table>
+  <tr>
+    <th>
+      User
+    </th>
+    <th>
+      Approve
+    </th>
+  </tr>
+  <tr *ngFor="let user of pendingApproval">
+    <td>
+      {{user.username}}
+    </td>
+    <td>
+      <input type="button" value="approve" (click)="userService.approveUser(user.id)">
+    </td>
+  </tr>
+</table>
