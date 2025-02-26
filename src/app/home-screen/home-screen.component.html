@@ -1,0 +1,5 @@
+
+<input *ngIf="!authService.isAuthenticated()" type="button" value="Login" (click)="authService.login()" />
+<input *ngIf="authService.isAuthenticated()" type="button" value="Logout" (click)="authService.logout()" />
+<br/>
+<app-navigation></app-navigation>
