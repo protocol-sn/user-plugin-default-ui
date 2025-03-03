@@ -14,5 +14,5 @@ import {NgIf} from '@angular/common';
   styleUrl: './navigation.component.css'
 })
 export class NavigationComponent {
-  authService: AuthService = inject(AuthService);
+  protected readonly authService: AuthService = inject(AuthService);
 }
