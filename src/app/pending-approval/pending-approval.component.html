@@ -8,13 +8,25 @@
     <th>
       Approve
     </th>
+    <th>
+      Approve with default groups
+    </th>
   </tr>
   <tr *ngFor="let user of pendingApproval">
     <td>
       {{user.username}}
     </td>
     <td>
-      <input type="button" value="approve" (click)="userService.approveUser(user.id)">
+      <input type="button" value="approve" (click)="userService.approveUser(user.id); removeUserPendingApproval(user)">
+    </td>
+    <td>
+      <input type="button" value="approve with default groups" (click)="userService.approveUserWithDefaultGroups(user.id); removeUserPendingApproval(user)">
     </td>
   </tr>
 </table>
+<br>
+<div>
+  <span>Default groups: </span><span *ngIf="defaultGroups.length == 0">None</span>
+  <br/>---<br/>
+  <span *ngFor="let group of defaultGroups">{{group.groupName}}</span>
+</div>
