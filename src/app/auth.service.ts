@@ -2,12 +2,16 @@ import {inject, Injectable} from '@angular/core';
 import {AuthConfig, OAuthService} from "angular-oauth2-oidc";
 import {Router} from "@angular/router";
 import {environment} from '../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly oidcSecurityService = inject(OAuthService);
+  private readonly httpClient = inject(HttpClient);
+  public roles: string[] = [];
 
   authCodeFlowConfig: AuthConfig = {
     // Url of the Identity Provider
@@ -38,13 +42,36 @@ export class AuthService {
     showDebugInformation: true,
   };
 
+  async initialize() {
+    console.log("initializing...");
+    this.oidcSecurityService.loadDiscoveryDocumentAndTryLogin().then(r => {});
+    this.oidcSecurityService.events
+      .forEach(event => {
+        console.log(event);
+        if (event.type === 'token_received') {
+          this.oidcSecurityService.loadUserProfile()
+            .then((value:Record<string, any>) => {
+              this.roles = value['info'].realm_access.roles;
+            });
+        }
+        else if(event.type === 'token_expires') {
+          //TODO: implement some sort of refresh logic e.g. warn the user
+          this.oidcSecurityService.refreshToken();
+        }
+      })
+      .then(value => {
+        console.log(value);
+      })
+      .finally(() => {});
+  }
+
   constructor(router: Router) {
     this.oidcSecurityService.configure(this.authCodeFlowConfig);
-    this.oidcSecurityService.loadDiscoveryDocumentAndTryLogin();
   }
 
   login(redirectRoute: string = '/') {
     this.oidcSecurityService.initLoginFlow();
+    return new Observable<boolean>(subscriber => subscriber.next(true));
   }
 
   logout() {

@@ -12,8 +12,6 @@ export class UserService {
   PENDING_APPROVAL_ENDPOINT = "/v0.1.1/users/pending-approval";
   APPROVE_USER_ENDPOINT = "/v0.1.1/users/approve/{userId}";
 
-  constructor() { }
-
   getUsersPendingApproval() {
     return this.apiService.doSecureGET<PsnUser[]>(environment.userPluginHome + this.PENDING_APPROVAL_ENDPOINT)
       .pipe(
@@ -35,6 +33,5 @@ export class UserService {
         console.log("did approval");
         console.log(value);
       });
-    // window.location.reload();
   }
 }
