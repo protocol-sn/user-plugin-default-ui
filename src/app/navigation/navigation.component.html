@@ -1,3 +1,5 @@
-<a [routerLink]="['/home']">Home</a>
-<br/>
-<a *ngIf="authService.roles.includes('node-user-admin')" [routerLink]="['/pendingApproval']">Users pending approval</a>
+<div>
+  <a [routerLink]="['/home']">Home</a>
+  <br/>
+  <a *ngIf="authService.roles.includes('node-user-admin')" [routerLink]="['/pendingApproval']">Users pending approval</a>
+</div>

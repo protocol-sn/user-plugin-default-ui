@@ -4,14 +4,23 @@ import {environment} from '../environments/environment';
 import {PsnUser} from './psn-user';
 import {map, Observable} from 'rxjs';
 import {UserGroup} from './user-group';
+import {AuthService} from './auth.service';
+import {HttpResponse} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   apiService: ApiService = inject(ApiService);
-  PENDING_APPROVAL_ENDPOINT = "/v0.1.1/users/pending-approval";
-  APPROVE_USER_ENDPOINT = "/v0.1.1/users/approve/{userId}";
+  authService: AuthService = inject(AuthService);
+  public readonly PENDING_APPROVAL_ENDPOINT = "/v0.1.1/users/pending-approval";
+  public readonly APPROVE_USER_ENDPOINT = "/v0.1.1/users/approve/{userId}";
+  public readonly GET_USER_ENDPOINT = "/v0.3.6/users/{userId}";
+  public readonly REQUEST_VERIFICATION_ENDPOINT = "/v0.3.3/users/verify/{userId}";
+  private readonly GET_DEFAULT_GROUPS_ENDPOINT = "/v0.3.4/user-groups/defaults";
+  private readonly ADD_TO_GROUPS_ENDPOINT = "/v0.3.0/user-groups/{userId}/group/{groupId}";
+  public user: PsnUser | undefined;
+  private loggedInUser: PsnUser | undefined;
 
   getUsersPendingApproval() {
     return this.apiService.doSecureGET<PsnUser[]>(environment.userPluginHome + this.PENDING_APPROVAL_ENDPOINT)
@@ -36,9 +45,37 @@ export class UserService {
       });
   }
 
+  approveUserWithDefaultGroups(id: string) {
+    this.apiService.doSecurePUT(environment.userPluginHome + this.APPROVE_USER_ENDPOINT.replace("{userId}", id))
+      .subscribe(value => {
+        console.log("preparing to add to groups");
+        this.getDefaultGroups()
+          .subscribe(defaultGroups => {
+            for (let group of defaultGroups) {
+              this.apiService.doSecurePUT(environment.userPluginHome + this.ADD_TO_GROUPS_ENDPOINT.replace("{userId}", id).replace("{groupId}", group.id))
+                .subscribe(value => {
+                  console.log("added to group");
+                  console.log(value);
+                });
+            }
+          })
+      });
+  }
+
+  requestVerification() {
+    this.apiService.doSecurePOST(environment.userPluginHome + this.REQUEST_VERIFICATION_ENDPOINT.replace("{userId}", this.authService.sub))
+      .subscribe((value:HttpResponse<any>) => {
+        console.log("Put done. Refreshing");
+        if (this.loggedInUser) {
+          this.loggedInUser.requestsVerification = true;
+        }
+        this.setUser(this.authService.sub);
+      });
+  }
+
   getDefaultGroups(){
     console.log("getting default groups");
-    return this.apiService.doSecureGET<UserGroup[]>(environment.userPluginHome + "/v0.3.4/user-groups/defaults")
+    return this.apiService.doSecureGET<UserGroup[]>(environment.userPluginHome + this.GET_DEFAULT_GROUPS_ENDPOINT)
       .pipe(
         map(
           value => {
@@ -52,20 +89,50 @@ export class UserService {
       );
   }
 
-  approveUserWithDefaultGroups(id: string) {
-    this.apiService.doSecurePUT(environment.userPluginHome + this.APPROVE_USER_ENDPOINT.replace("{userId}", id))
-      .subscribe(value => {
-        console.log("preparing to add to groups");
-        this.getDefaultGroups()
-          .subscribe(defaultGroups => {
-            for (let group of defaultGroups) {
-              this.apiService.doSecurePUT(environment.userPluginHome + "/v0.3.0/user-groups/" + id + "/group/" + group.id)
-                .subscribe(value => {
-                  console.log("added to group");
-                  console.log(value);
-                });
+  getUser(id: string = this.authService.sub): Observable<PsnUser> {
+    return this.apiService.doSecureGET<PsnUser>(environment.userPluginHome + this.GET_USER_ENDPOINT.replace("{userId}", id))
+      .pipe(
+        map(
+          value => {
+            if (value.ok && value.body) {
+              console.log(value.body);
+              return value.body;
             }
-          })
-      });
+            return <PsnUser>{};
+          }
+        ));
+  }
+
+  setUser(id: string) {
+    console.log("setting user");
+    this.getUser(id)
+      .subscribe(value => {
+        console.log(value);
+        this.user = value;
+        console.log(this.user);
+      })
+  }
+
+  getLoggedInUser() {
+    console.log("getting logged in user");
+    if (this.loggedInUser) {
+      console.log("already have user");
+      return new Observable<PsnUser>(subscriber => subscriber.next(this.loggedInUser));
+    }
+    if (!this.authService.sub) {
+      this.authService.loadUser();
+    }
+    if (this.authService.sub) {
+      return this.getUser(this.authService.sub)
+        .pipe(
+          map(
+            value => {
+              this.loggedInUser = value;
+              return value;
+            }
+          )
+        );
+    }
+    return new Observable<PsnUser>(subscriber => subscriber.next(<PsnUser>{}));
   }
 }

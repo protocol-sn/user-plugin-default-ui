@@ -1,5 +1,12 @@
-
-<input *ngIf="!authService.isAuthenticated()" type="button" value="Login" (click)="authService.login()" />
-<input *ngIf="authService.isAuthenticated()" type="button" value="Logout" (click)="authService.logout()" />
-<br/>
-<app-navigation></app-navigation>
+<div *ngIf="!authService.isAuthenticated()">
+  <input type="button" value="Login" (click)="authService.login()" />
+</div>
+<div *ngIf="authService.isAuthenticated()">
+  <span>Logged in as: {{(userService.getLoggedInUser() | async)?.username}}</span>
+  <br/>
+  <input type="button" value="Logout" (click)="authService.logout()" />
+  <div *ngIf="evaluateCanRequestVerification(userService.getLoggedInUser()) | async" >
+    <input type="button" value="Request verification" (click)="userService.requestVerification()" />
+  </div>
+  <app-navigation></app-navigation>
+</div>

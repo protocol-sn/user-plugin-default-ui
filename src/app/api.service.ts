@@ -1,7 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {AuthService} from "./auth.service";
-import {PsnUser} from './psn-user';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +14,6 @@ export class ApiService {
     let headers = new HttpHeaders();
     headers = headers.set('Accept', accept);
     headers = headers.set('Authorization', 'Bearer ' + this.authService.getAccessToken());
-    console.log("doing PUT to " + url);
     return this.http.put<T>(url, body, {headers: headers, observe: "response"})
   }
 
@@ -37,5 +35,13 @@ export class ApiService {
 
     return this.http
       .get(url, { headers: headers })
+  }
+
+  public doSecurePOST<T>(url: string, accept: string = "application/json", body: any = null) {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', accept);
+    headers = headers.set('Authorization', 'Bearer ' + this.authService.getAccessToken());
+    headers = headers.set('Content-Type', 'application/json');
+    return this.http.post<T>(url, body, {headers: headers, observe: "response"})
   }
 }

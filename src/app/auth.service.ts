@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {environment} from '../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {UserService} from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,8 @@ export class AuthService {
   private readonly oidcSecurityService = inject(OAuthService);
   private readonly httpClient = inject(HttpClient);
   public roles: string[] = [];
+  public sub: string = "";
+  public userName: string = "";
 
   authCodeFlowConfig: AuthConfig = {
     // Url of the Identity Provider
@@ -42,7 +45,7 @@ export class AuthService {
     showDebugInformation: true,
   };
 
-  async initialize() {
+  async initialize(userService: UserService) {
     console.log("initializing...");
     this.oidcSecurityService.loadDiscoveryDocumentAndTryLogin().then(r => {});
     this.oidcSecurityService.events
@@ -51,7 +54,8 @@ export class AuthService {
         if (event.type === 'token_received') {
           this.oidcSecurityService.loadUserProfile()
             .then((value:Record<string, any>) => {
-              this.roles = value['info'].realm_access.roles;
+              this.loadUser();
+              userService.setUser(this.sub);
             });
         }
         else if(event.type === 'token_expires') {
@@ -92,5 +96,29 @@ export class AuthService {
 
   getScopes() {
     return this.oidcSecurityService.getGrantedScopes();
+  }
+
+  loadUser() {
+    if (this.isAuthenticated()) {
+      if (!this.oidcSecurityService.discoveryDocumentLoaded) {
+        this.oidcSecurityService.loadDiscoveryDocument()
+          .then(value => {
+            this.setValuesFromUserProfile();
+          });
+      }
+      else {
+        this.setValuesFromUserProfile();
+      }
+    }
+  }
+
+  private setValuesFromUserProfile() {
+    this.oidcSecurityService.loadUserProfile().then((value: Record<string, any>) => {
+      console.log("got user profile");
+      console.log(value);
+      this.roles = value['info'].realm_access.roles;
+      this.sub = value['info'].sub;
+      this.userName = value['info'].preferred_username;
+    });
   }
 }
