@@ -17,13 +17,9 @@ import {PsnUser} from '../psn-user';
   styleUrl: './home-screen.component.css',
   standalone: true,
 })
-export class HomeScreenComponent implements OnInit {
+export class HomeScreenComponent {
   protected readonly authService: AuthService = inject(AuthService);
   protected readonly userService: UserService = inject(UserService);
-
-  ngOnInit() {
-    console.log(this.userService.user);
-  }
 
   protected evaluateCanRequestVerification(loggedInUser:Observable<PsnUser>) {
     return loggedInUser

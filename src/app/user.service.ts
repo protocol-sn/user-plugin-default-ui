@@ -37,10 +37,8 @@ export class UserService {
   }
 
   approveUser(userId: string) {
-    console.log("Approving user: " + userId);
     this.apiService.doSecurePUT(environment.userPluginHome + this.APPROVE_USER_ENDPOINT.replace("{userId}", userId))
       .subscribe(value => {
-        console.log("did approval");
         console.log(value);
       });
   }
@@ -48,13 +46,11 @@ export class UserService {
   approveUserWithDefaultGroups(id: string) {
     this.apiService.doSecurePUT(environment.userPluginHome + this.APPROVE_USER_ENDPOINT.replace("{userId}", id))
       .subscribe(value => {
-        console.log("preparing to add to groups");
         this.getDefaultGroups()
           .subscribe(defaultGroups => {
             for (let group of defaultGroups) {
               this.apiService.doSecurePUT(environment.userPluginHome + this.ADD_TO_GROUPS_ENDPOINT.replace("{userId}", id).replace("{groupId}", group.id))
                 .subscribe(value => {
-                  console.log("added to group");
                   console.log(value);
                 });
             }
@@ -65,7 +61,6 @@ export class UserService {
   requestVerification() {
     this.apiService.doSecurePOST(environment.userPluginHome + this.REQUEST_VERIFICATION_ENDPOINT.replace("{userId}", this.authService.sub))
       .subscribe((value:HttpResponse<any>) => {
-        console.log("Put done. Refreshing");
         if (this.loggedInUser) {
           this.loggedInUser.requestsVerification = true;
         }
@@ -74,12 +69,10 @@ export class UserService {
   }
 
   getDefaultGroups(){
-    console.log("getting default groups");
     return this.apiService.doSecureGET<UserGroup[]>(environment.userPluginHome + this.GET_DEFAULT_GROUPS_ENDPOINT)
       .pipe(
         map(
           value => {
-            console.log("parsing default groups");
             if (value.ok && value.body) {
               return value.body;
             }
@@ -95,7 +88,6 @@ export class UserService {
         map(
           value => {
             if (value.ok && value.body) {
-              console.log(value.body);
               return value.body;
             }
             return <PsnUser>{};
@@ -104,19 +96,14 @@ export class UserService {
   }
 
   setUser(id: string) {
-    console.log("setting user");
     this.getUser(id)
       .subscribe(value => {
-        console.log(value);
         this.user = value;
-        console.log(this.user);
       })
   }
 
   getLoggedInUser() {
-    console.log("getting logged in user");
     if (this.loggedInUser) {
-      console.log("already have user");
       return new Observable<PsnUser>(subscriber => subscriber.next(this.loggedInUser));
     }
     if (!this.authService.sub) {

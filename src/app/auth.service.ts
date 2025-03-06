@@ -114,7 +114,6 @@ export class AuthService {
 
   private setValuesFromUserProfile() {
     this.oidcSecurityService.loadUserProfile().then((value: Record<string, any>) => {
-      console.log("got user profile");
       console.log(value);
       this.roles = value['info'].realm_access.roles;
       this.sub = value['info'].sub;
