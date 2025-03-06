@@ -5,4 +5,6 @@ export interface PsnUser {
   givenName: string;
   familyName: string;
   approved: boolean;
+  verified: boolean;
+  requestsVerification:boolean;
 }
