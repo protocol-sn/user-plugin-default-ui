@@ -61,3 +61,5 @@ For more information on using the Angular CLI, including detailed command refere
 ## TODOs
 
 - [ ] Set up smart refresh logic
+- [ ] Investigate http request caching
+- [ ] Unit tests

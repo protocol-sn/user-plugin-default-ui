@@ -13,12 +13,14 @@ import {HttpResponse} from '@angular/common/http';
 export class UserService {
   apiService: ApiService = inject(ApiService);
   authService: AuthService = inject(AuthService);
-  public readonly PENDING_APPROVAL_ENDPOINT = "/v0.1.1/users/pending-approval";
-  public readonly APPROVE_USER_ENDPOINT = "/v0.1.1/users/approve/{userId}";
-  public readonly GET_USER_ENDPOINT = "/v0.3.6/users/{userId}";
-  public readonly REQUEST_VERIFICATION_ENDPOINT = "/v0.3.3/users/verify/{userId}";
-  private readonly GET_DEFAULT_GROUPS_ENDPOINT = "/v0.3.4/user-groups/defaults";
-  private readonly ADD_TO_GROUPS_ENDPOINT = "/v0.3.0/user-groups/{userId}/group/{groupId}";
+  public readonly PENDING_APPROVAL_ENDPOINT = "/users/pending-approval";
+  public readonly APPROVE_USER_ENDPOINT = "/users/approve/{userId}";
+  public readonly GET_USER_ENDPOINT = "/users/{userId}";
+  public readonly REQUEST_VERIFICATION_ENDPOINT = "/users/verify/{userId}";
+  private readonly GET_DEFAULT_GROUPS_ENDPOINT = "/user-groups/defaults";
+  private readonly ADD_TO_GROUPS_ENDPOINT = "/user-groups/{userId}/group/{groupId}";
+  private readonly USER_PENDING_VERIFICATION_ENDPOINT = "/users/pending-verification";
+  private readonly VERIFY_USER_ENDPOINT = "/users/verify/{userId}";
   public user: PsnUser | undefined;
   private loggedInUser: PsnUser | undefined;
 
@@ -36,10 +38,29 @@ export class UserService {
       );
   }
 
+  getUsersPendingVerification() {
+    return this.apiService.doSecureGET<PsnUser[]>(environment.userPluginHome + this.USER_PENDING_VERIFICATION_ENDPOINT)
+      .pipe(
+        map(
+          value => {
+            if (value.ok && value.body) {
+              return value.body;
+            }
+            return <PsnUser[]>[];
+          }
+        )
+      );
+  }
+
+  verifyUser(userId: string) {
+    this.apiService.doSecurePUT(environment.userPluginHome + this.VERIFY_USER_ENDPOINT.replace("{userId}", userId))
+      .subscribe(value => {
+      });
+  }
+
   approveUser(userId: string) {
     this.apiService.doSecurePUT(environment.userPluginHome + this.APPROVE_USER_ENDPOINT.replace("{userId}", userId))
       .subscribe(value => {
-        console.log(value);
       });
   }
 

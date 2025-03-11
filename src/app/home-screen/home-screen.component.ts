@@ -25,9 +25,6 @@ export class HomeScreenComponent {
     return loggedInUser
       .pipe(
         map(loggedInUser => {
-          console.log(loggedInUser);
-          console.log((loggedInUser.verified == null)  + "||" + !loggedInUser.verified);
-          console.log((loggedInUser.requestsVerification == null)  + "||" + !loggedInUser.requestsVerification);
           return (loggedInUser.verified == null || !loggedInUser.verified) &&
             (loggedInUser.requestsVerification == null || !loggedInUser.requestsVerification);
         }));
