@@ -100,6 +100,9 @@ export class AuthService {
 
   loadUser() {
     if (this.isAuthenticated()) {
+      if (this.roles && this.sub && this.userName) {
+        return;
+      }
       if (!this.oidcSecurityService.discoveryDocumentLoaded) {
         this.oidcSecurityService.loadDiscoveryDocument()
           .then(value => {
@@ -114,7 +117,6 @@ export class AuthService {
 
   private setValuesFromUserProfile() {
     this.oidcSecurityService.loadUserProfile().then((value: Record<string, any>) => {
-      console.log(value);
       this.roles = value['info'].realm_access.roles;
       this.sub = value['info'].sub;
       this.userName = value['info'].preferred_username;

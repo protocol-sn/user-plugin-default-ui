@@ -1,0 +1,20 @@
+<app-navigation></app-navigation>
+<br/>
+<table>
+  <tr>
+    <th>
+      User
+    </th>
+    <th>
+      Verify
+    </th>
+  </tr>
+  <tr *ngFor="let user of pendingVerification">
+    <td>
+      {{user.username}}
+    </td>
+    <td>
+      <input type="button" value="verify" (click)="userService.verifyUser(user.id); removeUserPendingVerification(user)">
+    </td>
+  </tr>
+</table>

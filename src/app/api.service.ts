@@ -28,7 +28,6 @@ export class ApiService {
   }
 
   public doUnsecureGET(url: string, accept: string = "application/json") {
-    console.log("Doing unsecure call...");
 
     let headers = new HttpHeaders();
     headers.set('Accept', 'text/json');
