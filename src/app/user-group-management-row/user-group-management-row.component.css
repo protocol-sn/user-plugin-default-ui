@@ -1,0 +1,6 @@
+.users-section {
+  display: flex;
+  flex-direction: row;
+  width: 30%;
+  padding-top: 2px;
+}

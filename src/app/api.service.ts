@@ -43,4 +43,11 @@ export class ApiService {
     headers = headers.set('Content-Type', 'application/json');
     return this.http.post<T>(url, body, {headers: headers, observe: "response"})
   }
+
+  doSecureDELETE<T>(url: string, accept: string = "application/json") {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', accept);
+    headers = headers.set('Authorization', 'Bearer ' + this.authService.getAccessToken());
+    return this.http.delete<T>(url, {headers: headers, observe: "response"})
+  }
 }

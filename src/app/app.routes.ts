@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import {HomeScreenComponent} from './home-screen/home-screen.component';
 import {PendingApprovalComponent} from './pending-approval/pending-approval.component';
 import {PendingVerificationComponent} from './pending-verification/pending-verification.component';
+import {UserGroupManagementComponent} from './user-group-management/user-group-management.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
@@ -13,5 +14,9 @@ export const routes: Routes = [
   {
     path: 'pendingVerification',
     component: PendingVerificationComponent,
+  },
+  {
+    path: 'groupManagement',
+    component: UserGroupManagementComponent,
   },
 ];

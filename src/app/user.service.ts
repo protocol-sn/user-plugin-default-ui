@@ -21,6 +21,7 @@ export class UserService {
   private readonly ADD_TO_GROUPS_ENDPOINT = "/user-groups/{userId}/group/{groupId}";
   private readonly USER_PENDING_VERIFICATION_ENDPOINT = "/users/pending-verification";
   private readonly VERIFY_USER_ENDPOINT = "/users/verify/{userId}";
+  private readonly QUERY_GROUPS_ENDPOINT = "/user-groups";
   public user: PsnUser | undefined;
   private loggedInUser: PsnUser | undefined;
 
@@ -36,6 +37,18 @@ export class UserService {
           }
         )
       );
+  }
+
+  removeUserFromGroup(user: string, group: string) {
+    this.apiService.doSecureDELETE(environment.userPluginHome + this.ADD_TO_GROUPS_ENDPOINT.replace("{userId}", user).replace("{groupId}", group))
+      .subscribe(value => {
+      });
+  }
+
+  addUserToGroup(user: string, group: string) {
+    this.apiService.doSecurePUT(environment.userPluginHome + this.ADD_TO_GROUPS_ENDPOINT.replace("{userId}", user).replace("{groupId}", group))
+      .subscribe(value => {
+      });
   }
 
   getUsersPendingVerification() {
@@ -87,6 +100,20 @@ export class UserService {
         }
         this.setUser(this.authService.sub);
       });
+  }
+
+  queryGroups() {
+    return this.apiService.doSecurePOST<UserGroup[]>(environment.userPluginHome + this.QUERY_GROUPS_ENDPOINT, "application/json", {})
+      .pipe(
+        map(
+          value => {
+            if (value.ok && value.body) {
+              return value.body;
+            }
+            return <UserGroup[]>[];
+          }
+        )
+      );
   }
 
   getDefaultGroups(){
@@ -142,5 +169,24 @@ export class UserService {
         );
     }
     return new Observable<PsnUser>(subscriber => subscriber.next(<PsnUser>{}));
+  }
+
+  queryUsers(query: string, offset: number = 0, limit: number = 25) {
+    let queryCriteria = {
+      offset: offset,
+      limit: limit,
+      search: query,
+    }
+    return this.apiService.doSecurePOST<PsnUser[]>(environment.userPluginHome + "/users/query", "application/json", queryCriteria)
+      .pipe(
+        map(
+          value => {
+            if (value.ok && value.body) {
+              return value.body;
+            }
+            return <PsnUser[]>[];
+          }
+        )
+      );
   }
 }
