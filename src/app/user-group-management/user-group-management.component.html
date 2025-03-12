@@ -1,0 +1,13 @@
+<app-navigation></app-navigation>
+Query users:
+<input type="text" [id]="'queryText'" [(ngModel)]="userQueryString"/>
+<input type="button" value="query" (click)="queryUsers(userQueryString)"/>
+<br/>
+<div *ngIf="foundUsers.length > 0">
+      <app-user-group-management-row *ngFor="let user of foundUsers"
+          [user]="user"
+          [allGroups]="foundGroups"
+          [refreshFn]="queryUsers"
+          [refreshFnArg]="userQueryString">
+      </app-user-group-management-row>
+</div>

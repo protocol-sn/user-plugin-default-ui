@@ -1,3 +1,5 @@
+import {UserGroup} from './user-group';
+
 export interface PsnUser {
   id: string;
   username: string;
@@ -7,4 +9,5 @@ export interface PsnUser {
   approved: boolean;
   verified: boolean;
   requestsVerification:boolean;
+  groupMembership: UserGroup[]
 }

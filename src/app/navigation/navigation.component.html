@@ -4,4 +4,6 @@
   <a *ngIf="authService.roles.includes('node-user-admin')" [routerLink]="['/pendingApproval']">Users pending approval</a>
   <br/>
   <a *ngIf="authService.roles.includes('verifier')" [routerLink]="['/pendingVerification']">Users pending verification</a>
+  <br/>
+  <a *ngIf="authService.roles.includes('node-user-admin')" [routerLink]="['/groupManagement']">User group management</a>
 </div>
