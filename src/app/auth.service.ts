@@ -59,7 +59,6 @@ export class AuthService {
             });
         }
         else if(event.type === 'token_expires') {
-          //TODO: implement some sort of refresh logic e.g. warn the user
           this.oidcSecurityService.refreshToken();
         }
       })

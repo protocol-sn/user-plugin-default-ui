@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {UserService} from '../user.service';
-import {AsyncPipe, NgFor, NgIf} from '@angular/common';
+import {NgFor, NgIf} from '@angular/common';
 import {PsnUser} from '../psn-user';
 import {NavigationComponent} from '../navigation/navigation.component';
 import { Router } from '@angular/router';
