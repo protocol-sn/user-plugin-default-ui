@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {AuthService} from '../auth.service';
 import {NavigationComponent} from '../navigation/navigation.component';
 import {AsyncPipe, NgIf} from '@angular/common';
